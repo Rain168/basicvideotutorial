@@ -27,4 +27,13 @@
         android:layout_height="wrap_content"
         android:text="@string/video_record_play"
         android:padding="5dp"/>
+
+     <Button
+        android:id="@+id/bt_start04"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/opengl_preview"
+        android:padding="5dp"/>
+
+
 </LinearLayout>

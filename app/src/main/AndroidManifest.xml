@@ -6,9 +6,12 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <!--摄像头-->
     <uses-permission android:name="android.permission.CAMERA"/>
+
     <uses-feature android:name="android.hardware.camera.autofocus"/>
-    <uses-feature android:name="android.hardware.camera"
-                  android:required="true" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true"/>
+
     <application
         android:name=".APP"
         android:allowBackup="true"
@@ -29,6 +32,8 @@
         <activity android:name=".audio.AudioRecordActivity">
         </activity>
         <activity android:name=".video.VideoCameraActivity">
+        </activity>
+        <activity android:name=".opengl.OpenGLESActivity">
         </activity>
     </application>
 
