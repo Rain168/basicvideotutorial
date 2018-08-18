@@ -30,4 +30,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/audio_stop_play_record"/>
+
+    <Button
+        android:id="@+id/bt_pcm2wav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/audio_covert_pcm2wav"/>
+
+    <Button
+        android:id="@+id/bt_play_wav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/audio_play_wav"/>
 </LinearLayout>

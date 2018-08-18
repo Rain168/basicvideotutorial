@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.os.Build;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -52,6 +53,8 @@ public class AudioRecordActivity extends AppCompatActivity implements Runnable {
     private Button mBtStopRecord;
     private Button mBtPlayRecord;
     private Button mBtStopPlayRecord;
+    private Button mBtPlayWAV;
+    private Button mBtPcm2wav;
 
 
     @Override
@@ -97,6 +100,8 @@ public class AudioRecordActivity extends AppCompatActivity implements Runnable {
         mBtStopRecord = findViewById(R.id.bt_stop_record);
         mBtPlayRecord = findViewById(R.id.bt_play_record);
         mBtStopPlayRecord = findViewById(R.id.bt_stop_play_record);
+        mBtPcm2wav = findViewById(R.id.bt_pcm2wav);
+        mBtPlayWAV = findViewById(R.id.bt_play_wav);
     }
 
 
@@ -133,8 +138,39 @@ public class AudioRecordActivity extends AppCompatActivity implements Runnable {
             public void onClick(View v) {
                 stopPlayRecord();
             }
-
         });
+        mBtPcm2wav.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pcm2wav();
+            }
+        });
+        mBtPlayWAV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                playWav();
+            }
+        });
+    }
+
+    /**
+     * 播放转化后的 WAV
+     */
+    private void playWav() {
+        String path = mFileRoot + File.separator + mFileName;
+        String tmp = mFileRoot + File.separator + mFileName;
+        String result = tmp.substring(0, tmp.lastIndexOf(".")) + ".wav";
+        AudioTrackManager.getInstance().startPlay(result);
+    }
+
+    /**
+     * PCM 转化为 WAV
+     */
+    private void pcm2wav() {
+        String path = mFileRoot + File.separator + mFileName;
+        String tmp = mFileRoot + File.separator + mFileName;
+        String result = tmp.substring(0, tmp.lastIndexOf(".")) + ".wav";
+        AudioUtil.convertPcm2Wav(path, result, mSampleRateInHz, mChannelConfig, mAudioFormat);
     }
 
     /**

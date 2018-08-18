@@ -6,6 +6,8 @@
     <string name="audio_stop_record">停止采集</string>
     <string name="audio_play_record">开始播放</string>
     <string name="audio_stop_play_record">停止播放</string>
+    <string name="audio_covert_pcm2wav">PCM转化为WAV</string>
+    <string name="audio_play_wav">播放WAV</string>
     <string name="need_check_permission">需要检查权限</string>
     <string name="audio_permisson_denied_tips">Permission Denied</string>
 </resources>
