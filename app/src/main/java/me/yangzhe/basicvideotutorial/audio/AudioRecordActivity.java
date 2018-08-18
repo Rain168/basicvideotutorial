@@ -50,6 +50,8 @@ public class AudioRecordActivity extends AppCompatActivity implements Runnable {
     private DataOutputStream mDataOutputStream;
     private Button mBtStartRecord;
     private Button mBtStopRecord;
+    private Button mBtPlayRecord;
+    private Button mBtStopPlayRecord;
 
 
     @Override
@@ -90,6 +92,14 @@ public class AudioRecordActivity extends AppCompatActivity implements Runnable {
             mFileRoot.mkdirs();//创建文件夹
     }
 
+    private void initView() {
+        mBtStartRecord = findViewById(R.id.bt_start_record);
+        mBtStopRecord = findViewById(R.id.bt_stop_record);
+        mBtPlayRecord = findViewById(R.id.bt_play_record);
+        mBtStopPlayRecord = findViewById(R.id.bt_stop_play_record);
+    }
+
+
     private void iniEvent() {
         mBtStartRecord.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,6 +121,35 @@ public class AudioRecordActivity extends AppCompatActivity implements Runnable {
                 stopRecord();
             }
         });
+
+        mBtPlayRecord.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                playRecord();
+            }
+        });
+        mBtStopPlayRecord.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopPlayRecord();
+            }
+
+        });
+    }
+
+    /**
+     * 停止播放录音
+     */
+    private void stopPlayRecord() {
+        AudioTrackManager.getInstance().stopPlay();
+    }
+
+    /**
+     * 开始播放录音
+     */
+    private void playRecord() {
+        String path = mFileRoot + File.separator + mFileName;
+        AudioTrackManager.getInstance().startPlay(path);
     }
 
     /**
@@ -169,10 +208,6 @@ public class AudioRecordActivity extends AppCompatActivity implements Runnable {
         }
     }
 
-    private void initView() {
-        mBtStartRecord = findViewById(R.id.bt_start_record);
-        mBtStopRecord = findViewById(R.id.bt_stop_record);
-    }
 
     @Override
     public void run() {

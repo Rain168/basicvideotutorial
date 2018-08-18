@@ -18,4 +18,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/audio_stop_record"/>
+
+    <Button
+        android:id="@+id/bt_play_record"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/audio_play_record"/>
+
+    <Button
+        android:id="@+id/bt_stop_play_record"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/audio_stop_play_record"/>
 </LinearLayout>
