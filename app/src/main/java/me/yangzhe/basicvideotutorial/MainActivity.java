@@ -10,6 +10,7 @@ import me.yangzhe.basicvideotutorial.image.DrawImageViewActivity;
 import me.yangzhe.basicvideotutorial.audio.AudioRecordActivity;
 import me.yangzhe.basicvideotutorial.opengl.FirstOpenglRenderer;
 import me.yangzhe.basicvideotutorial.opengl.OpenGLESActivity;
+import me.yangzhe.basicvideotutorial.opengl.TrialgleActivity;
 import me.yangzhe.basicvideotutorial.video.VideoCameraActivity;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -55,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(new Intent(this, VideoCameraActivity.class));
                 break;
             case R.id.bt_start04:
-                startActivity(new Intent(this, OpenGLESActivity.class));
+                startActivity(new Intent(this, TrialgleActivity.class));
                 break;
             default:
                 break;
