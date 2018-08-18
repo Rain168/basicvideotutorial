@@ -6,6 +6,8 @@ import java.io.IOException;
 
 /**
  * PCM WAV 转换工具类
+ *  1. https://www.jianshu.com/p/947528f3dff8?utm_campaign=maleskine&utm_content=note&utm_medium=seo_notes&utm_source=recommendation
+ *  2. https://www.jianshu.com/p/f7863638acbe?utm_campaign=maleskine&utm_content=note&utm_medium=seo_notes&utm_source=recommendation
  */
 public class WAVUtil {
     /**

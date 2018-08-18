@@ -8,6 +8,7 @@ import android.widget.Button;
 
 import me.yangzhe.basicvideotutorial.image.DrawImageViewActivity;
 import me.yangzhe.basicvideotutorial.audio.AudioRecordActivity;
+import me.yangzhe.basicvideotutorial.video.VideoCameraActivity;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(new Intent(this, AudioRecordActivity.class));
                 break;
             case R.id.bt_start03:
+                startActivity(new Intent(this, VideoCameraActivity.class));
                 break;
             default:
                 break;
