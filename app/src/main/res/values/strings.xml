@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">basicvideotutorial</string>
+    <string name="show_image">图片显示</string>
+    <string name="audio_record_play">音频采集和播放</string>
+    <string name="audio_start_record">开始采集</string>
+    <string name="audio_stop_record">停止采集</string>
+    <string name="need_check_permission">需要检查权限</string>
+    <string name="audio_permisson_denied_tips">Permission Denied</string>
+</resources>
