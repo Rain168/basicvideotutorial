@@ -17,4 +17,5 @@
     <string name="separate_mp4">分离MP4</string>
     <string name="h264_decode">H264 解码</string>
     <string name="h264_encode">H264 编码</string>
+    <string name="audio_aac_encode">AAC 编码</string>
 </resources>

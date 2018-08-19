@@ -18,6 +18,10 @@ public class LogUtil {
     }
 
     public static void d(String message) {
-        Log.e(TAG, message);
+        Log.d(TAG, message);
+    }
+
+    public static void w(String message) {
+        Log.w(TAG, message);
     }
 }

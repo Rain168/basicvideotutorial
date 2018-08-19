@@ -45,6 +45,8 @@
         </activity>
         <activity android:name=".mediacodec.DecodeActivity">
         </activity>
+        <activity android:name=".mediacodec.audio_aac.AudioCodecActivity">
+        </activity>
     </application>
 
 </manifest>
