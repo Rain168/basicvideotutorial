@@ -1,4 +1,4 @@
-package me.yangzhe.basicvideotutorial.video;
+package me.yangzhe.basicvideotutorial.camera;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -17,7 +17,7 @@ import android.widget.ImageView;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import me.yangzhe.basicvideotutorial.audio.LogUtil;
+import me.yangzhe.basicvideotutorial.utils.LogUtil;
 
 /**
  * A basic Camera preview class

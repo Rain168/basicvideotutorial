@@ -1,4 +1,4 @@
-package me.yangzhe.basicvideotutorial.video;
+package me.yangzhe.basicvideotutorial.camera;
 
 import android.content.Context;
 import android.content.pm.PackageManager;

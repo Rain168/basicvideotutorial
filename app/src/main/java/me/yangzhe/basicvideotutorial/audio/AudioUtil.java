@@ -11,11 +11,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import me.yangzhe.basicvideotutorial.utils.LogUtil;
+
 /**
  * Created by Jalen on 2018/8/18.
  */
 class AudioUtil {
-
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     public static boolean getFormatInfo(String musicFileUrl, String decodeFileUrl,

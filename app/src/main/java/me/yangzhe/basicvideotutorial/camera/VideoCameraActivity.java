@@ -1,9 +1,8 @@
-package me.yangzhe.basicvideotutorial.video;
+package me.yangzhe.basicvideotutorial.camera;
 
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.TextureView;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;

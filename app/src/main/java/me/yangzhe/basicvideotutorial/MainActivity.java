@@ -8,10 +8,9 @@ import android.widget.Button;
 
 import me.yangzhe.basicvideotutorial.image.DrawImageViewActivity;
 import me.yangzhe.basicvideotutorial.audio.AudioRecordActivity;
-import me.yangzhe.basicvideotutorial.opengl.FirstOpenglRenderer;
-import me.yangzhe.basicvideotutorial.opengl.OpenGLESActivity;
 import me.yangzhe.basicvideotutorial.opengl.TrialgleActivity;
-import me.yangzhe.basicvideotutorial.video.VideoCameraActivity;
+import me.yangzhe.basicvideotutorial.camera.VideoCameraActivity;
+import me.yangzhe.basicvideotutorial.video.CompileVideoActivity;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -19,6 +18,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button mBt_start02;
     private Button mBt_start03;
     private Button mBt_start04;
+    private Button mBt_start05;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mBt_start02 = findViewById(R.id.bt_start02);
         mBt_start03 = findViewById(R.id.bt_start03);
         mBt_start04 = findViewById(R.id.bt_start04);
+        mBt_start05 = findViewById(R.id.bt_start05);
     }
 
 
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mBt_start02.setOnClickListener(this);
         mBt_start03.setOnClickListener(this);
         mBt_start04.setOnClickListener(this);
+        mBt_start05.setOnClickListener(this);
     }
 
     @Override
@@ -57,6 +59,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.bt_start04:
                 startActivity(new Intent(this, TrialgleActivity.class));
+                break;
+            case R.id.bt_start05:
+                startActivity(new Intent(this, CompileVideoActivity.class));
                 break;
             default:
                 break;

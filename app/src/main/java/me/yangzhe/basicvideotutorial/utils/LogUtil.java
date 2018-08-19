@@ -1,4 +1,4 @@
-package me.yangzhe.basicvideotutorial.audio;
+package me.yangzhe.basicvideotutorial.utils;
 
 import android.util.Log;
 
@@ -15,5 +15,9 @@ public class LogUtil {
 
     public static void i(String message) {
         Log.i(TAG, message);
+    }
+
+    public static void d(String message) {
+        Log.e(TAG, message);
     }
 }

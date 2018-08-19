@@ -31,11 +31,13 @@
         </activity>
         <activity android:name=".audio.AudioRecordActivity">
         </activity>
-        <activity android:name=".video.VideoCameraActivity">
+        <activity android:name=".camera.VideoCameraActivity">
         </activity>
         <activity android:name=".opengl.OpenGLESActivity">
         </activity>
         <activity android:name=".opengl.TrialgleActivity">
+        </activity>
+        <activity android:name=".video.CompileVideoActivity">
         </activity>
     </application>
 
