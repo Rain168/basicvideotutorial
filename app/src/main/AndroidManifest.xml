@@ -39,6 +39,12 @@
         </activity>
         <activity android:name=".video.CompileVideoActivity">
         </activity>
+        <activity android:name=".mediacodec.MediaCodecActivity">
+        </activity>
+        <activity android:name=".mediacodec.CodecActivity">
+        </activity>
+        <activity android:name=".mediacodec.DecodeActivity">
+        </activity>
     </application>
 
 </manifest>

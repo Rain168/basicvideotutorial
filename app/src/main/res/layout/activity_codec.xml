@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="me.yangzhe.basicvideotutorial.mediacodec.CodecActivity">
+
+    <Button
+        android:id="@+id/bt_h264_encode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/h264_encode"/>
+
+    <Button
+        android:id="@+id/bt_h264_decode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/h264_decode"/>
+</LinearLayout>
