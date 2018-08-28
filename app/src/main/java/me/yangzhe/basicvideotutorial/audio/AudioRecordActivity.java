@@ -5,7 +5,6 @@ import android.content.pm.PackageManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
-import android.os.Build;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -22,6 +21,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import me.yangzhe.basicvideotutorial.R;
+import me.yangzhe.basicvideotutorial.utils.ToastUtil;
 
 public class AudioRecordActivity extends AppCompatActivity implements Runnable {
     private static final String TAG = AudioRecordActivity.class.getSimpleName();

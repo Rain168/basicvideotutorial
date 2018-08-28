@@ -2,26 +2,30 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rl_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/rl_root"
     tools:context="me.yangzhe.basicvideotutorial.image.DrawImageViewActivity">
 
-    <!--<ImageView-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:scaleType="fitXY"-->
-    <!--android:src="@drawable/prettygirl"/>-->
+    <ImageView
+        android:id="@+id/img_middle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:visibility="gone"
+        />
 
-    <!--<me.yangzhe.basicvideotutorial.start01.CustomSurfaceView-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"/>-->
+    <me.yangzhe.basicvideotutorial.image.CustomImageView
+        android:id="@+id/img_custom"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
 
-    <!--<me.yangzhe.basicvideotutorial.start01.CustomImageView-->
-    <!--android:id="@+id/img_custom"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"/>-->
-
+    <me.yangzhe.basicvideotutorial.image.CustomSurfaceView
+        android:id="@+id/sf_custom"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
 
 
 </RelativeLayout>

@@ -49,6 +49,7 @@ public class AudioCodec {
     private int key_bit_rate;
     private int key_sample_rate;
     private int sampleRateType;
+    private int keyAACProfile;
 
     private ArrayBlockingQueue<byte[]> queue;
 
@@ -105,14 +106,37 @@ public class AudioCodec {
             for (int i = 0; i < mediaExtractor.getTrackCount(); i++) {//遍历媒体轨道 此处我们传入的是音频文件，所以也就只有一条轨道
                 MediaFormat format = mediaExtractor.getTrackFormat(i);
                 String mime = format.getString(MediaFormat.KEY_MIME);
+                LogUtil.d("mime:" + mime);
                 if (mime.startsWith("audio")) {//获取音频轨道
                     mediaExtractor.selectTrack(i);//选择此音频轨道
-                    LogUtil.d("mime:" + mime);
+
                     key_bit_rate = format.getInteger(MediaFormat.KEY_BIT_RATE);
                     key_channel_count = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT);
                     key_sample_rate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE);
+//                    keyAACProfile = format.getInteger(MediaFormat.KEY_AAC_PROFILE);
                     sampleRateType = ADTSUtils.getSampleRateType(key_sample_rate);
+//                    LogUtil.e("keyAACProfile:" + keyAACProfile);
+                    LogUtil.e("key_bit_rate:" + key_bit_rate);
+                    LogUtil.e("key_channel_count:" + key_channel_count);
+                    LogUtil.e("key_sample_rate:" + key_sample_rate);
+                    LogUtil.e("sampleRateType:" + sampleRateType);
                     mediaDecode = MediaCodec.createDecoderByType(mime);//创建Decode解码器
+
+                    format.setString(MediaFormat.KEY_MIME, mime);
+                    format.setInteger(MediaFormat.KEY_CHANNEL_COUNT, key_channel_count);
+                    format.setInteger(MediaFormat.KEY_SAMPLE_RATE, key_sample_rate);
+                    format.setInteger(MediaFormat.KEY_BIT_RATE, key_bit_rate);
+
+                    // TODO: 2018/8/19  AAC 的解码
+//                    //用来标记AAC是否有adts头，1->有
+//                    format.setInteger(MediaFormat.KEY_IS_ADTS, 1);
+//                    //用来标记aac的类型
+//                    format.setInteger(MediaFormat.KEY_AAC_PROFILE, 0);
+//                    //ByteBuffer key（暂时不了解该参数的含义，但必须设置）
+//                    byte[] data = new byte[]{(byte) 0x11, (byte) 0x90};
+//                    ByteBuffer csd_0 = ByteBuffer.wrap(data);
+//                    format.setByteBuffer("csd-0", csd_0);
+
                     mediaDecode.configure(format, null, null, 0);
                     break;
                 }

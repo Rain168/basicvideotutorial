@@ -1,12 +1,17 @@
 package me.yangzhe.basicvideotutorial.image;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * 自定义View 显示图片
@@ -50,9 +55,6 @@ public class CustomImageView extends View {
         if (mBitmap == null) {
             return;
         }
-
-//        canvas.save();
         canvas.drawBitmap(mBitmap, 0, 0, mPaint);
-//        canvas.restore();
     }
 }

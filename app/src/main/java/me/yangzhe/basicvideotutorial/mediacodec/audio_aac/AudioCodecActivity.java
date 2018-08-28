@@ -43,8 +43,10 @@ public class AudioCodecActivity extends AppCompatActivity {
 
     private void startRecord() {
         final AudioCodec audioCodec = AudioCodec.newInstance();
+
         audioCodec.setIOPath(FileUtil.getAbosultePath("dream.mp3"),
                 FileUtil.getAbosultePath("dream.aac"));
+
         audioCodec.prepare();
         audioCodec.startAsync();
         audioCodec.setOnCompleteListener(new AudioCodec.OnCompleteListener() {

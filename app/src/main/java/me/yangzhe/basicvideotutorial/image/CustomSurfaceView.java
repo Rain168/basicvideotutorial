@@ -1,6 +1,7 @@
 package me.yangzhe.basicvideotutorial.image;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -19,10 +20,12 @@ public class CustomSurfaceView extends SurfaceView implements SurfaceHolder.Call
 
     private Canvas mCanvas;
     private Paint mPaint;
+    private Context mContext;
 
     private Thread mThread;
     private boolean isRunning;
-
+    public static final String PICTURE_NAME = "prettygirl.png";
+    private Bitmap mBitmap;
 
     public CustomSurfaceView(Context context) {
         this(context, null);
@@ -34,6 +37,7 @@ public class CustomSurfaceView extends SurfaceView implements SurfaceHolder.Call
 
     public CustomSurfaceView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        mContext = context;
         init();
     }
 
@@ -78,7 +82,7 @@ public class CustomSurfaceView extends SurfaceView implements SurfaceHolder.Call
         try {
             mCanvas = mHolder.lockCanvas();
             if (mCanvas != null) {
-                mCanvas.drawBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.prettygirl), 0, 0, mPaint);
+                mCanvas.drawBitmap(Util.getImageFromAssetsFile(mContext, PICTURE_NAME), 0, 0, mPaint);
             }
         } catch (Exception e) {
             e.printStackTrace();
