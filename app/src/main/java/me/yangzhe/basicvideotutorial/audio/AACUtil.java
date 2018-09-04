@@ -1,9 +1,11 @@
 package me.yangzhe.basicvideotutorial.audio;
 
+import android.media.AudioFormat;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
+import android.media.MediaRecorder;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
@@ -36,11 +38,9 @@ public class AACUtil {
     private MediaCodec mediaDecode;
     private MediaCodec mediaEncode;
     private MediaExtractor mediaExtractor;
-    private ByteBuffer[] decodeInputBuffers;
-    private ByteBuffer[] decodeOutputBuffers;
+
     private ByteBuffer[] encodeInputBuffers;
     private ByteBuffer[] encodeOutputBuffers;
-    private MediaCodec.BufferInfo decodeBufferInfo;
     private MediaCodec.BufferInfo encodeBufferInfo;
     private FileOutputStream fos;
     private BufferedOutputStream bos;
@@ -49,13 +49,6 @@ public class AACUtil {
     private OnCompleteListener onCompleteListener;
     private OnProgressListener onProgressListener;
     private long fileTotalSize;
-    private long decodeSize;
-
-    private int key_channel_count;
-    private int key_bit_rate;
-    private int key_sample_rate;
-    private int sampleRateType;
-    private int keyAACProfile;
 
     private ArrayBlockingQueue<byte[]> queue;
 
@@ -102,17 +95,22 @@ public class AACUtil {
         initAACMediaEncode();//AAC编码器
     }
 
+    private static final int samples_per_frame = 2048;
+    private static final int mSampleRateInHz = 44100;
+    private static final int mChannelConfig = AudioFormat.CHANNEL_CONFIGURATION_MONO; //单声道
     /**
      * 初始化AAC编码器
      */
     private void initAACMediaEncode() {
         try {
-            LogUtil.d(key_bit_rate + " " + key_channel_count + " " + key_sample_rate + " " + sampleRateType);
-            MediaFormat encodeFormat = MediaFormat.createAudioFormat(MediaFormat.MIMETYPE_AUDIO_AAC,
-                    key_sample_rate, key_channel_count);//参数对应-> mime type、采样率、声道数
-            encodeFormat.setInteger(MediaFormat.KEY_BIT_RATE, key_bit_rate);//比特率
+
+            MediaFormat encodeFormat = MediaFormat.createAudioFormat(MediaFormat.MIMETYPE_AUDIO_AAC, mSampleRateInHz, mChannelConfig);
+            encodeFormat.setInteger(MediaFormat.KEY_BIT_RATE, 64000);//比特率
+            encodeFormat.setInteger(MediaFormat.KEY_CHANNEL_COUNT, mChannelConfig);
+            encodeFormat.setInteger(MediaFormat.KEY_CHANNEL_MASK, AudioFormat.CHANNEL_IN_MONO);
             encodeFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);
-            encodeFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 100 * 1024);
+            encodeFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, samples_per_frame);//作用于inputBuffer的大小
+
             mediaEncode = MediaCodec.createEncoderByType(MediaFormat.MIMETYPE_AUDIO_AAC);
             mediaEncode.configure(encodeFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
         } catch (IOException e) {
@@ -187,11 +185,16 @@ public class AACUtil {
         FileInputStream fio = null;
         try {
             fio = new FileInputStream(file);
-            byte[] bb = new byte[1024];
-            while (fio.read(bb) != -1) {
-                putPCMData(bb);
+            byte[] bb = new byte[samples_per_frame];
+            while (!codeOver) {
+                if (fio.read(bb) != -1) {
+                    LogUtil.e("============   putPCMData ============" + bb.length);
+                    putPCMData(bb);
+                } else {
+                    codeOver = true;
+                }
             }
-            codeOver = true;
+
             fio.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -258,14 +261,27 @@ public class AACUtil {
      * @param packetLen
      */
     private void addADTStoPacket(byte[] packet, int packetLen) {
+//        int profile = 2; // AAC LC
+//        int freqIdx = sampleRateType; // 44.1KHz
+//        int chanCfg = 2; // CPE
+//
+//
+//// fill in ADTS data
+//        packet[0] = (byte) 0xFF;
+//        packet[1] = (byte) 0xF9;
+//        packet[2] = (byte) (((profile - 1) << 6) + (freqIdx << 2) + (chanCfg >> 2));
+//        packet[3] = (byte) (((chanCfg & 3) << 6) + (packetLen >> 11));
+//        packet[4] = (byte) ((packetLen & 0x7FF) >> 3);
+//        packet[5] = (byte) (((packetLen & 7) << 5) + 0x1F);
+//        packet[6] = (byte) 0xFC;
+
         int profile = 2; // AAC LC
-        int freqIdx = sampleRateType; // 44.1KHz
-        int chanCfg = 2; // CPE
+        int freqIdx = mSampleRateInHz; // 16KHz
+        int chanCfg = 1; // CPE
 
-
-// fill in ADTS data
+        // fill in ADTS data
         packet[0] = (byte) 0xFF;
-        packet[1] = (byte) 0xF9;
+        packet[1] = (byte) 0xF1;
         packet[2] = (byte) (((profile - 1) << 6) + (freqIdx << 2) + (chanCfg >> 2));
         packet[3] = (byte) (((chanCfg & 3) << 6) + (packetLen >> 11));
         packet[4] = (byte) ((packetLen & 0x7FF) >> 3);
@@ -359,7 +375,7 @@ public class AACUtil {
             if (onCompleteListener != null) {
                 onCompleteListener.completed();
             }
-            LogUtil.w("size:" + fileTotalSize + " decodeSize:" + decodeSize + "time:" + (System.currentTimeMillis() - t));
+            LogUtil.w("size:" + fileTotalSize  + "time:" + (System.currentTimeMillis() - t));
         }
     }
 
