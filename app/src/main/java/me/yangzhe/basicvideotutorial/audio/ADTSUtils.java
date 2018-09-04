@@ -1,4 +1,4 @@
-package me.yangzhe.basicvideotutorial.mediacodec.audio_aac;
+package me.yangzhe.basicvideotutorial.audio;
 
 import java.util.HashMap;
 import java.util.Map;

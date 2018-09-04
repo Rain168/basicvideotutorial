@@ -12,10 +12,13 @@
     <string name="audio_stop_play_record">停止播放</string>
     <string name="audio_covert_pcm2wav">PCM转化为WAV</string>
     <string name="audio_play_wav">播放WAV</string>
+    <string name="audio_covert_pcm2aac">PCM转化为AAC</string>
+    <string name="audio_play_aac">播放AAC</string>
     <string name="need_check_permission">需要检查权限</string>
     <string name="audio_permisson_denied_tips">Permission Denied</string>
     <string name="separate_mp4">分离MP4</string>
     <string name="h264_decode">H264 解码</string>
     <string name="h264_encode">H264 编码</string>
     <string name="audio_aac_encode">AAC 编码</string>
+    <string name="encode_process">转码进度</string>
 </resources>

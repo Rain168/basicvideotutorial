@@ -42,4 +42,22 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/audio_play_wav"/>
+
+    <Button
+        android:id="@+id/bt_pcm2aac"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/audio_covert_pcm2aac"/>
+
+    <Button
+        android:id="@+id/bt_play_aac"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/audio_play_aac"/>
+
+    <TextView
+        android:id="@+id/tv_encode_process"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/encode_process"/>
 </LinearLayout>

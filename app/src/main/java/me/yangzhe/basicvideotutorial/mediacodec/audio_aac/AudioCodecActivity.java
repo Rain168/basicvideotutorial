@@ -14,14 +14,16 @@ import me.yangzhe.basicvideotutorial.R;
 import me.yangzhe.basicvideotutorial.utils.FileUtil;
 
 /**
- * Author : eric
- * CreateDate : 2018/1/4  10:26
- * Email : ericli_wang@163.com
- * Version : 2.0
- * Desc :
- * Modified :
+ * Author:    yangzhe
+ * Version    V1.0
+ * Date:      2018/9/4 下午11:10
+ * Description:
+ * Modification  History: 转码工具类
+ * Date         	Author        		Version        	Description
+ * -----------------------------------------------------------------------------------
+ * 2018/9/4       yangzhe              1.0                1.0
+ * Why & What is modified:
  */
-
 public class AudioCodecActivity extends AppCompatActivity {
     private TextView tvInfo;
     public static final String Path = Environment.getExternalStorageDirectory().getPath() + "/audioCodec/";

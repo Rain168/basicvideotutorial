@@ -13,15 +13,34 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 import me.yangzhe.basicvideotutorial.R;
+import me.yangzhe.basicvideotutorial.mediacodec.audio_aac.AudioCodec;
+import me.yangzhe.basicvideotutorial.utils.FileUtil;
 import me.yangzhe.basicvideotutorial.utils.ToastUtil;
+
+/**
+ * Author:    yangzhe
+ * Version    V1.0
+ * Date:      2018/9/4 下午10:58
+ * Description:  音频采集、PCM、WAV、AAC 格式
+ * Modification  History:
+ * Date         	Author        		Version        	Description
+ * -----------------------------------------------------------------------------------
+ * 2018/9/4       yangzhe              1.0                1.0
+ * Why & What is modified:
+ */
 
 public class AudioRecordActivity extends AppCompatActivity implements Runnable {
     private static final String TAG = AudioRecordActivity.class.getSimpleName();
@@ -48,6 +67,7 @@ public class AudioRecordActivity extends AppCompatActivity implements Runnable {
     private static final String mFileName = "audiorecordtest.pcm";
     //缓冲区中数据写入到数据，因为需要使用IO操作，因此读取数据的过程应该在子线程中执行。
     private Thread mThread;
+
     private DataOutputStream mDataOutputStream;
     private Button mBtStartRecord;
     private Button mBtStopRecord;
@@ -55,7 +75,9 @@ public class AudioRecordActivity extends AppCompatActivity implements Runnable {
     private Button mBtStopPlayRecord;
     private Button mBtPlayWAV;
     private Button mBtPcm2wav;
-
+    private Button mBtPlayAAC;
+    private Button mBtPcm2aac;
+    private TextView mTvEncodeProcess;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +86,6 @@ public class AudioRecordActivity extends AppCompatActivity implements Runnable {
         initData();
         initView();
         iniEvent();
-
     }
 
     private static final int MY_PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
@@ -102,6 +123,9 @@ public class AudioRecordActivity extends AppCompatActivity implements Runnable {
         mBtStopPlayRecord = findViewById(R.id.bt_stop_play_record);
         mBtPcm2wav = findViewById(R.id.bt_pcm2wav);
         mBtPlayWAV = findViewById(R.id.bt_play_wav);
+        mBtPcm2aac = findViewById(R.id.bt_pcm2aac);
+        mBtPlayAAC = findViewById(R.id.bt_play_aac);
+        mTvEncodeProcess = findViewById(R.id.tv_encode_process);
     }
 
 
@@ -151,6 +175,62 @@ public class AudioRecordActivity extends AppCompatActivity implements Runnable {
                 playWav();
             }
         });
+
+        mBtPcm2aac.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pcm2aac();
+            }
+        });
+        mBtPlayAAC.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                playAAC();
+            }
+        });
+    }
+
+    private void pcm2aac() {
+        String path = mFileRoot + File.separator + mFileName;
+        String result = path.substring(0, path.lastIndexOf(".")) + ".aac";
+        final AACUtil aacUtil = AACUtil.newInstance();
+
+        aacUtil.setIOPath(path, result);
+
+        aacUtil.prepare();
+        aacUtil.startAsync();
+        aacUtil.setOnCompleteListener(new AACUtil.OnCompleteListener() {
+            @Override
+            public void completed() {
+                aacUtil.release();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mTvEncodeProcess.setText("100%");
+                    }
+                });
+            }
+        });
+        final DecimalFormat df = (DecimalFormat) NumberFormat.getInstance();
+        df.applyPattern("##.##%");
+        aacUtil.setOnProgressListener(new AACUtil.OnProgressListener() {
+
+            @Override
+            public void progress(final long current, final long total) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mTvEncodeProcess.setText(current + "/" + total + "  " + df.format((double) current / total));
+                    }
+                });
+            }
+        });
+    }
+
+    private void playAAC() {
+        String path = mFileRoot + File.separator + mFileName;
+        String result = path.substring(0, path.lastIndexOf(".")) + ".aac";
+        AudioTrackManager.getInstance().startPlay(result);
     }
 
     /**
@@ -158,8 +238,7 @@ public class AudioRecordActivity extends AppCompatActivity implements Runnable {
      */
     private void playWav() {
         String path = mFileRoot + File.separator + mFileName;
-        String tmp = mFileRoot + File.separator + mFileName;
-        String result = tmp.substring(0, tmp.lastIndexOf(".")) + ".wav";
+        String result = path.substring(0, path.lastIndexOf(".")) + ".wav";
         AudioTrackManager.getInstance().startPlay(result);
     }
 
@@ -168,9 +247,8 @@ public class AudioRecordActivity extends AppCompatActivity implements Runnable {
      */
     private void pcm2wav() {
         String path = mFileRoot + File.separator + mFileName;
-        String tmp = mFileRoot + File.separator + mFileName;
-        String result = tmp.substring(0, tmp.lastIndexOf(".")) + ".wav";
-        AudioUtil.convertPcm2Wav(path, result, mSampleRateInHz, mChannelConfig, mAudioFormat);
+        String result = path.substring(0, path.lastIndexOf(".")) + ".wav";
+        WAVUtil.convertPcm2Wav(path, result, mSampleRateInHz, mChannelConfig, mAudioFormat);
     }
 
     /**
@@ -235,7 +313,8 @@ public class AudioRecordActivity extends AppCompatActivity implements Runnable {
         isRecording = false;
         //停止录音，回收AudioRecord对象，释放内存
         if (mAudioRecord != null) {
-            if (mAudioRecord.getState() == AudioRecord.STATE_INITIALIZED) {//初始化成功
+            //初始化成功
+            if (mAudioRecord.getState() == AudioRecord.STATE_INITIALIZED) {
                 mAudioRecord.stop();
             }
             if (mAudioRecord != null) {

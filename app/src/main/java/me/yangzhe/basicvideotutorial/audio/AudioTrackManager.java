@@ -9,6 +9,18 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 
+/**
+ * Author:    yangzhe
+ * Version    V1.0
+ * Date:      2018/9/4 下午11:02
+ * Description: 音频播放类
+ * Modification  History:
+ * Date         	Author        		Version        	Description
+ * -----------------------------------------------------------------------------------
+ * 2018/9/4       yangzhe              1.0                1.0
+ * Why & What is modified:
+ */
+
 public class AudioTrackManager {
     private AudioTrack mAudioTrack;
     private DataInputStream mDis;//播放文件的数据流
@@ -99,7 +111,7 @@ public class AudioTrackManager {
     /**
      * 播放线程
      */
-    Runnable recordRunnable = new Runnable() {
+    private Runnable recordRunnable = new Runnable() {
         @Override
         public void run() {
             try {
@@ -148,17 +160,8 @@ public class AudioTrackManager {
      */
     public void startPlay(String path) {
         try {
-//            //AudioTrack未初始化
-//            if(mAudioTrack.getState() == AudioTrack.STATE_UNINITIALIZED){
-//                throw new RuntimeException("The AudioTrack is not uninitialized");
-//            }//AudioRecord.getMinBufferSize的参数是否支持当前的硬件设备
-//            else if (AudioTrack.ERROR_BAD_VALUE == mMinBufferSize || AudioTrack.ERROR == mMinBufferSize) {
-//                throw new RuntimeException("AudioTrack Unable to getMinBufferSize");
-//            }else{
             setPath(path);
             startThread();
-//            }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
