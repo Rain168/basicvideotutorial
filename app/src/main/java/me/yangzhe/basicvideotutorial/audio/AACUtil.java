@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import me.yangzhe.basicvideotutorial.utils.IOUtil;
 import me.yangzhe.basicvideotutorial.utils.LogUtil;
 
 /**
@@ -33,6 +34,7 @@ import me.yangzhe.basicvideotutorial.utils.LogUtil;
  * Why & What is modified:
  */
 public class AACUtil {
+
     private String srcPath;
     private String dstPath;
     private MediaCodec mediaDecode;
@@ -95,23 +97,24 @@ public class AACUtil {
         initAACMediaEncode();//AAC编码器
     }
 
-    private static final int samples_per_frame = 2048;
-    private static final int mSampleRateInHz = 44100;
-    private static final int mChannelConfig = AudioFormat.CHANNEL_CONFIGURATION_MONO; //单声道
+
+    private String encodeType = MediaFormat.MIMETYPE_AUDIO_AAC;
+
     /**
      * 初始化AAC编码器
      */
     private void initAACMediaEncode() {
         try {
 
-            MediaFormat encodeFormat = MediaFormat.createAudioFormat(MediaFormat.MIMETYPE_AUDIO_AAC, mSampleRateInHz, mChannelConfig);
+            //参数对应-> mime type、采样率、声道数
+            MediaFormat encodeFormat = MediaFormat.createAudioFormat(MediaFormat.MIMETYPE_AUDIO_AAC, 16000, 1);
             encodeFormat.setInteger(MediaFormat.KEY_BIT_RATE, 64000);//比特率
-            encodeFormat.setInteger(MediaFormat.KEY_CHANNEL_COUNT, mChannelConfig);
+            encodeFormat.setInteger(MediaFormat.KEY_CHANNEL_COUNT, 1);
             encodeFormat.setInteger(MediaFormat.KEY_CHANNEL_MASK, AudioFormat.CHANNEL_IN_MONO);
             encodeFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);
-            encodeFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, samples_per_frame);//作用于inputBuffer的大小
+            encodeFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 1024);//作用于inputBuffer的大小
 
-            mediaEncode = MediaCodec.createEncoderByType(MediaFormat.MIMETYPE_AUDIO_AAC);
+            mediaEncode = MediaCodec.createEncoderByType(encodeType);
             mediaEncode.configure(encodeFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
         } catch (IOException e) {
             e.printStackTrace();
@@ -121,10 +124,13 @@ public class AACUtil {
             LogUtil.e("create mediaEncode failed");
             return;
         }
+
         mediaEncode.start();
         encodeInputBuffers = mediaEncode.getInputBuffers();
         encodeOutputBuffers = mediaEncode.getOutputBuffers();
         encodeBufferInfo = new MediaCodec.BufferInfo();
+
+
     }
 
     private boolean codeOver = false;
@@ -138,40 +144,6 @@ public class AACUtil {
         LogUtil.w("start");
 
         new Thread(new DecodeRunnable()).start();
-        new Thread(new EncodeRunnable()).start();
-
-    }
-
-    /**
-     * 将PCM数据存入队列
-     *
-     * @param pcmChunk PCM数据块
-     */
-    private void putPCMData(byte[] pcmChunk) {
-        try {
-            LogUtil.d("put queue size:" + queue.size());
-            queue.put(pcmChunk);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            LogUtil.e("queue put error");
-        }
-    }
-
-    /**
-     * 在Container中队列取出PCM数据
-     *
-     * @return PCM数据块
-     */
-    private byte[] getPCMData() {
-        try {
-            if (queue.isEmpty()) {
-                return null;
-            }
-            return queue.take();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
 
@@ -185,11 +157,11 @@ public class AACUtil {
         FileInputStream fio = null;
         try {
             fio = new FileInputStream(file);
-            byte[] bb = new byte[samples_per_frame];
+            byte[] bb = new byte[1024];
             while (!codeOver) {
                 if (fio.read(bb) != -1) {
                     LogUtil.e("============   putPCMData ============" + bb.length);
-                    putPCMData(bb);
+                    dstAudioFormatFromPCM(bb);
                 } else {
                     codeOver = true;
                 }
@@ -202,56 +174,65 @@ public class AACUtil {
 
     }
 
+
+    private byte[] chunkAudio = new byte[0];
+
     /**
-     * 编码PCM数据 得到MediaFormat.MIMETYPE_AUDIO_AAC格式的音频文件，并保存到{@link #dstPath}
+     * 编码PCM数据 得到AAC格式的音频文件
      */
-    private void dstAudioFormatFromPCM() {
+    private void dstAudioFormatFromPCM(byte[] pcmData) {
 
         int inputIndex;
         ByteBuffer inputBuffer;
         int outputIndex;
         ByteBuffer outputBuffer;
-        byte[] chunkAudio;
+
         int outBitSize;
         int outPacketSize;
-        byte[] chunkPCM;
+        byte[] PCMAudio;
+        PCMAudio = pcmData;
 
-        for (int i = 0; i < encodeInputBuffers.length - 1; i++) {
-            chunkPCM = getPCMData();//获取解码器所在线程输出的数据 代码后边会贴上
-            if (chunkPCM == null) {
-                break;
-            }
-            inputIndex = mediaEncode.dequeueInputBuffer(-1);//同解码器
-            inputBuffer = encodeInputBuffers[inputIndex];//同解码器
-            inputBuffer.clear();//同解码器
-            inputBuffer.limit(chunkPCM.length);
-            inputBuffer.put(chunkPCM);//PCM数据填充给inputBuffer
-            mediaEncode.queueInputBuffer(inputIndex, 0, chunkPCM.length, 0, 0);//通知编码器 编码
-        }
+        encodeInputBuffers = mediaEncode.getInputBuffers();
+        encodeOutputBuffers = mediaEncode.getOutputBuffers();
+        encodeBufferInfo = new MediaCodec.BufferInfo();
 
-        outputIndex = mediaEncode.dequeueOutputBuffer(encodeBufferInfo, 10000);//同解码器
-        while (outputIndex >= 0) {//同解码器
+
+        inputIndex = mediaEncode.dequeueInputBuffer(0);
+        inputBuffer = encodeInputBuffers[inputIndex];
+        inputBuffer.clear();
+        inputBuffer.limit(PCMAudio.length);
+        inputBuffer.put(PCMAudio);//PCM数据填充给inputBuffer
+        mediaEncode.queueInputBuffer(inputIndex, 0, PCMAudio.length, 0, 0);//通知编码器 编码
+
+
+        outputIndex = mediaEncode.dequeueOutputBuffer(encodeBufferInfo, 0);
+        while (outputIndex > 0) {
 
             outBitSize = encodeBufferInfo.size;
-            outPacketSize = outBitSize + 7;//7为ADTS头部的大小
+            outPacketSize = outBitSize + 7;//7为ADT头部的大小
             outputBuffer = encodeOutputBuffers[outputIndex];//拿到输出Buffer
             outputBuffer.position(encodeBufferInfo.offset);
             outputBuffer.limit(encodeBufferInfo.offset + outBitSize);
             chunkAudio = new byte[outPacketSize];
-            addADTStoPacket(chunkAudio, outPacketSize);//添加ADTS 代码后面会贴上
-            outputBuffer.get(chunkAudio, 7, outBitSize);//将编码得到的AAC数据 取出到byte[]中 偏移量offset=7 你懂得
-            outputBuffer.position(encodeBufferInfo.offset);
+            addADTStoPacket(chunkAudio, outPacketSize);//添加ADTS
+            outputBuffer.get(chunkAudio, 7, outBitSize);//将编码得到的AAC数据 取出到byte[]中
+
             try {
-                bos.write(chunkAudio, 0, chunkAudio.length);//BufferOutputStream 将文件保存到内存卡中 *.aac
-                LogUtil.d("write " + chunkAudio.length);
+                //录制aac音频文件，保存在手机内存中
+                bos.write(chunkAudio, 0, chunkAudio.length);
+                bos.flush();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
+            outputBuffer.position(encodeBufferInfo.offset);
             mediaEncode.releaseOutputBuffer(outputIndex, false);
-            outputIndex = mediaEncode.dequeueOutputBuffer(encodeBufferInfo, 10000);
+            outputIndex = mediaEncode.dequeueOutputBuffer(encodeBufferInfo, 0);
 
         }
+
     }
 
     /**
@@ -261,22 +242,8 @@ public class AACUtil {
      * @param packetLen
      */
     private void addADTStoPacket(byte[] packet, int packetLen) {
-//        int profile = 2; // AAC LC
-//        int freqIdx = sampleRateType; // 44.1KHz
-//        int chanCfg = 2; // CPE
-//
-//
-//// fill in ADTS data
-//        packet[0] = (byte) 0xFF;
-//        packet[1] = (byte) 0xF9;
-//        packet[2] = (byte) (((profile - 1) << 6) + (freqIdx << 2) + (chanCfg >> 2));
-//        packet[3] = (byte) (((chanCfg & 3) << 6) + (packetLen >> 11));
-//        packet[4] = (byte) ((packetLen & 0x7FF) >> 3);
-//        packet[5] = (byte) (((packetLen & 7) << 5) + 0x1F);
-//        packet[6] = (byte) 0xFC;
-
         int profile = 2; // AAC LC
-        int freqIdx = mSampleRateInHz; // 16KHz
+        int freqIdx = 8; // 16KHz
         int chanCfg = 1; // CPE
 
         // fill in ADTS data
@@ -287,6 +254,7 @@ public class AACUtil {
         packet[4] = (byte) ((packetLen & 0x7FF) >> 3);
         packet[5] = (byte) (((packetLen & 7) << 5) + 0x1F);
         packet[6] = (byte) 0xFC;
+
     }
 
     /**
@@ -300,25 +268,7 @@ public class AACUtil {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if (bos != null) {
-                try {
-                    bos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    bos = null;
-                }
-            }
-        }
-
-        try {
-            if (fos != null) {
-                fos.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            fos = null;
+            IOUtil.close(bos, fos);
         }
 
         if (mediaEncode != null) {
@@ -352,30 +302,9 @@ public class AACUtil {
      * 解码线程
      */
     private class DecodeRunnable implements Runnable {
-
         @Override
         public void run() {
-//            while (!codeOver) {
             srcAudioFormatToPCM();
-//            }
-        }
-    }
-
-    /**
-     * 编码线程
-     */
-    private class EncodeRunnable implements Runnable {
-
-        @Override
-        public void run() {
-            long t = System.currentTimeMillis();
-            while (!codeOver || !queue.isEmpty()) {
-                dstAudioFormatFromPCM();
-            }
-            if (onCompleteListener != null) {
-                onCompleteListener.completed();
-            }
-            LogUtil.w("size:" + fileTotalSize  + "time:" + (System.currentTimeMillis() - t));
         }
     }
 

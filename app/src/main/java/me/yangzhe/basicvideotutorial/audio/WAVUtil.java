@@ -11,6 +11,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import me.yangzhe.basicvideotutorial.utils.IOUtil;
 import me.yangzhe.basicvideotutorial.utils.LogUtil;
 
 /**
@@ -25,106 +26,7 @@ import me.yangzhe.basicvideotutorial.utils.LogUtil;
  * Why & What is modified:
  */
 
-class WAVUtil {
-    /**
-     * 获取 音频的信息
-     *
-     * @param musicFileUrl
-     * @param decodeFileUrl
-     * @param startMicroseconds
-     * @param endMicroseconds
-     * @return
-     */
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-    public static boolean getFormatInfo(String musicFileUrl, String decodeFileUrl,
-                                        long startMicroseconds, long endMicroseconds) {
-        //采样率，声道数，时长，音频文件类型
-        int sampleRate = 0;
-        int channelCount = 0;
-        long duration = 0;
-        String mime = null;
-
-        //MediaExtractor, MediaFormat, MediaCodec
-        MediaExtractor mediaExtractor = new MediaExtractor();
-        MediaFormat mediaFormat = null;
-        MediaCodec mediaCodec = null;
-
-        //给媒体信息提取器设置源音频文件路径
-        try {
-            LogUtil.e("musicFileUrl:   " + musicFileUrl);
-            mediaExtractor.setDataSource(musicFileUrl);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            try {
-                mediaExtractor.setDataSource(new FileInputStream(musicFileUrl).getFD());
-            } catch (Exception e) {
-                e.printStackTrace();
-                LogUtil.e("设置解码音频文件路径错误");
-            }
-        }
-
-        //获取音频格式轨信息
-        mediaFormat = mediaExtractor.getTrackFormat(0);
-
-        //从音频格式轨信息中读取 采样率，声道数，时长，音频文件类型
-        sampleRate = mediaFormat.containsKey(MediaFormat.KEY_SAMPLE_RATE) ? mediaFormat.getInteger(
-                MediaFormat.KEY_SAMPLE_RATE) : 44100;
-        channelCount = mediaFormat.containsKey(MediaFormat.KEY_CHANNEL_COUNT) ? mediaFormat.getInteger(
-                MediaFormat.KEY_CHANNEL_COUNT) : 1;
-        duration = mediaFormat.containsKey(MediaFormat.KEY_DURATION) ? mediaFormat.getLong(
-                MediaFormat.KEY_DURATION) : 0;
-        mime = mediaFormat.containsKey(MediaFormat.KEY_MIME) ? mediaFormat.getString(MediaFormat.KEY_MIME)
-                : "";
-
-        LogUtil.i("歌曲信息Track info: mime:"
-                + mime
-                + " 采样率sampleRate:"
-                + sampleRate
-                + " channels:"
-                + channelCount
-                + " duration:"
-                + duration);
-
-        if (TextUtils.isEmpty(mime) || !mime.startsWith("audio/")) {
-            LogUtil.e("解码文件不是音频文件mime:" + mime);
-            return false;
-        }
-
-        if (mime.equals("audio/ffmpeg")) {
-            mime = "audio/mpeg";
-            mediaFormat.setString(MediaFormat.KEY_MIME, mime);
-        }
-
-        if (duration <= 0) {
-            LogUtil.e("音频文件duration为" + duration);
-            return false;
-        }
-
-        //解码的开始时间和结束时间
-        startMicroseconds = Math.max(startMicroseconds, 0);
-        endMicroseconds = endMicroseconds < 0 ? duration : endMicroseconds;
-        endMicroseconds = Math.min(endMicroseconds, duration);
-
-        if (startMicroseconds >= endMicroseconds) {
-            return false;
-        }
-
-        //创建一个解码器
-        try {
-            mediaCodec = MediaCodec.createDecoderByType(mime);
-
-            mediaCodec.configure(mediaFormat, null, null, 0);
-        } catch (Exception e) {
-            LogUtil.e("解码器configure出错");
-            return false;
-        }
-
-        //得到输出PCM文件的路径
-//        decodeFileUrl = decodeFileUrl.substring(0, decodeFileUrl.lastIndexOf("."));
-//        String pcmFilePath = decodeFileUrl + ".pcm";
-        return true;
-    }
-
+public class WAVUtil {
 
     /**
      * PCM文件转WAV文件
@@ -135,8 +37,7 @@ class WAVUtil {
      * @param channels       声道数 单声道：1或双声道：2
      * @param bitNum         采样位数，8或16
      */
-    public static void convertPcm2Wav(String inPcmFilePath, String outWavFilePath, int sampleRate,
-                                      int channels, int bitNum) {
+    public static void convertPcm2Wav(String inPcmFilePath, String outWavFilePath, int sampleRate,int channels, int bitNum) {
 
         FileInputStream in = null;
         FileOutputStream out = null;
@@ -164,20 +65,7 @@ class WAVUtil {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            IOUtil.close(in,out);
         }
     }
 
@@ -193,8 +81,7 @@ class WAVUtil {
      * @param byteRate      采样字节byte率
      * @throws IOException
      */
-    private static void writeWaveFileHeader(FileOutputStream out, long totalAudioLen,
-                                            long totalDataLen, int sampleRate, int channels, long byteRate) throws IOException {
+    private static void writeWaveFileHeader(FileOutputStream out, long totalAudioLen,long totalDataLen, int sampleRate, int channels, long byteRate) throws IOException {
         byte[] header = new byte[44];
         header[0] = 'R'; // RIFF
         header[1] = 'I';
@@ -251,6 +138,4 @@ class WAVUtil {
         header[43] = (byte) ((totalAudioLen >> 24) & 0xff);
         out.write(header, 0, 44);
     }
-
-
 }
